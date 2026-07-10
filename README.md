@@ -1,4 +1,4 @@
-# CartNest — Customer Segmentation using RFM Analysis
+# CartNest - Customer Segmentation using RFM Analysis
 
 End-to-end data analytics project using **SQL, Python, and Power BI** to segment customers based on purchasing behavior and drive data-informed marketing decisions.
 
