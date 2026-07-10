@@ -3,19 +3,15 @@ USE CartNestDB
 -- Query 1: Top 10% customers by revenue
 -- Output: 78 customers returned, led by highest spenders (e.g. CUST0002 ~2.4L)
 select top 10 percent 
-	customer_ID,
-	ROUND(SUM(Net_Amount),2) as Total_Revenue
+	customer_ID, ROUND(SUM(Net_Amount),2) as Total_Revenue
 from transactions
 group by Customer_ID
 order by Total_Revenue desc;
 
 -- Query 2a: Calculate RFM base metrics
 -- Output: Recency (days since last purchase), Frequency (order count), Monetary (total spend) per customer
-SELECT
-    Customer_ID,
-    DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
-    COUNT(DISTINCT Transaction_ID) AS Frequency,
-    ROUND(SUM(Net_Amount),2) AS Monetary
+SELECT Customer_ID, DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
+    COUNT(DISTINCT Transaction_ID) AS Frequency, ROUND(SUM(Net_Amount),2) AS Monetary
 FROM transactions
 GROUP BY Customer_ID
 ORDER BY Monetary DESC;
@@ -27,11 +23,8 @@ SELECT Customer_ID, Recency, Frequency, Monetary,
     NTILE(5) OVER (ORDER BY Frequency ASC) AS F_Score,
     NTILE(5) OVER (ORDER BY Monetary ASC) AS M_Score
 FROM (
-    SELECT
-        Customer_ID,
-        DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
-        COUNT(DISTINCT Transaction_ID) AS Frequency,
-        SUM(Net_Amount) AS Monetary
+    SELECT Customer_ID, DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
+        COUNT(DISTINCT Transaction_ID) AS Frequency, SUM(Net_Amount) AS Monetary
     FROM transactions
     GROUP BY Customer_ID
 ) AS base
@@ -39,8 +32,7 @@ ORDER BY Monetary DESC;
 
 -- Query 2c: Assign customer segments based on RFM score
 -- Output: Each customer labeled Champions / Loyal / At Risk / Lost based on RFM_Total
-SELECT Customer_ID, Recency, Frequency, Monetary,
-    (R_Score + F_Score + M_Score) AS RFM_Total,
+SELECT Customer_ID, Recency, Frequency, Monetary, (R_Score + F_Score + M_Score) AS RFM_Total,
     CASE
         WHEN (R_Score + F_Score + M_Score) >= 12 THEN 'Champions'
         WHEN (R_Score + F_Score + M_Score) >= 9 THEN 'Loyal'
@@ -48,17 +40,13 @@ SELECT Customer_ID, Recency, Frequency, Monetary,
         ELSE 'Lost'
     END AS Segment
 FROM (
-    SELECT
-        Customer_ID, Recency, Frequency, Monetary,
+    SELECT Customer_ID, Recency, Frequency, Monetary,
         NTILE(5) OVER (ORDER BY Recency DESC) AS R_Score,
         NTILE(5) OVER (ORDER BY Frequency ASC) AS F_Score,
         NTILE(5) OVER (ORDER BY Monetary ASC) AS M_Score
     FROM (
-        SELECT
-            Customer_ID,
-            DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
-            COUNT(DISTINCT Transaction_ID) AS Frequency,
-            SUM(Net_Amount) AS Monetary
+        SELECT Customer_ID, DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
+            COUNT(DISTINCT Transaction_ID) AS Frequency, SUM(Net_Amount) AS Monetary
         FROM transactions
         GROUP BY Customer_ID
     ) AS base
@@ -80,9 +68,57 @@ FROM (
         NTILE(5) OVER (ORDER BY Frequency ASC) AS F_Score,
         NTILE(5) OVER (ORDER BY Monetary ASC) AS M_Score
     FROM (
-        SELECT
-            Customer_ID,
-            DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
-            COUNT(DISTINCT Transaction_ID) AS Frequency,
-            SUM(Net_Amount) AS Monetary
+        SELECT Customer_ID, DATEDIFF(DAY, MAX(Transaction_Date), '2024-12-31') AS Recency,
+            COUNT(DISTINCT Transaction_ID) AS Frequency, SUM(Net_Amount) AS Monetary
         FROM transactions
+        GROUP BY Customer_ID
+    ) AS base
+) AS scored;
+
+-- Query 3: Count customers per segment
+-- Output: Champions=235, Loyal=187, At Risk=183, Lost=170
+SELECT Segment, COUNT(*) AS Customer_Count
+FROM vw_customer_rfm
+GROUP BY Segment
+ORDER BY Customer_Count DESC;
+
+-- Query 5: Revenue contribution by segment
+-- Output: Champions=74.96% of revenue, Loyal=15.27%, At Risk=7.21%, Lost=2.56%
+SELECT Segment, COUNT(*) AS Customer_Count, ROUND(SUM(Monetary), 2) AS Total_Revenue,
+ROUND(SUM(Monetary) * 100.0 / (SELECT SUM(Monetary) FROM vw_customer_rfm), 2) AS Revenue_Pct
+FROM vw_customer_rfm
+GROUP BY Segment
+ORDER BY Total_Revenue DESC;
+
+-- Query 6: Revenue by category within each segment (answers Q4)
+-- Output: Electronics leads revenue across every segment
+SELECT r.Segment, t.Category, ROUND(SUM(t.Net_Amount), 2) AS Category_Revenue
+FROM transactions t
+JOIN vw_customer_rfm r ON t.Customer_ID = r.Customer_ID
+GROUP BY r.Segment, t.Category
+ORDER BY r.Segment, Category_Revenue DESC;
+
+-- Query 7: Champions distribution by region (answers Q5)
+-- Output: West=51, East=48, South=48, Central=47, North=41
+SELECT c.Region, COUNT(*) AS Champion_Count
+FROM customers c
+JOIN vw_customer_rfm r ON c.Customer_ID = r.Customer_ID
+WHERE r.Segment = 'Champions'
+GROUP BY c.Region
+ORDER BY Champion_Count DESC;
+
+-- Query 8: Monthly revenue trend (answers Q7)
+-- Output: Steady growth from ~47K (Jan 2023) to ~57L (Dec 2024)
+SELECT  FORMAT(Transaction_Date, 'yyyy-MM') AS Month, ROUND(SUM(Net_Amount), 2) AS Monthly_Revenue
+FROM transactions
+GROUP BY FORMAT(Transaction_Date, 'yyyy-MM')
+ORDER BY Month;
+
+-- Query 9: Payment mode & channel preference among Champions (answers Q8)
+-- Output: No dominant preference, Net Banking marginally ahead
+SELECT t.Payment_Mode, t.Channel, COUNT(*) AS Transaction_Count
+FROM transactions t
+JOIN vw_customer_rfm r ON t.Customer_ID = r.Customer_ID
+WHERE r.Segment = 'Champions'
+GROUP BY t.Payment_Mode, t.Channel
+ORDER BY Transaction_Count DESC;
