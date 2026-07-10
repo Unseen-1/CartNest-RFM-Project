@@ -18,11 +18,11 @@ CartNest, a mid-sized e-commerce retailer, spends marketing budget equally acros
 
 ## Repository Structure
 '''
-SQL/                  -> RFM analysis queries | 
-Python/               -> Data cleaning, EDA, RFM notebook | 
-PowerBi/              -> Dashboard screenshots | 
-Data/                 -> Cleaned datasets used in analysis | 
-Documentation/        -> Full project documentation (BRD, FRD, recommendations)
+**SQL/**                 -> RFM analysis queries | 
+**Python/**             -> Data cleaning, EDA, RFM notebook | 
+**PowerBi/**             -> Dashboard screenshots | 
+**Data/**              -> Cleaned datasets used in analysis | 
+**Documentation/**        -> Full project documentation (BRD, FRD, recommendations)
 '''
 
 ## Dashboard Preview
