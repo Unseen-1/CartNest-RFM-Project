@@ -1,4 +1,4 @@
-# CartNest - Customer Segmentation using RFM Analysis
+# CartNest — Customer Segmentation using RFM Analysis
 
 End-to-end data analytics project using **SQL, Python, and Power BI** to segment customers based on purchasing behavior and drive data-informed marketing decisions.
 
@@ -12,19 +12,18 @@ CartNest, a mid-sized e-commerce retailer, spends marketing budget equally acros
 - No dominant payment/channel preference among high-value customers
 
 ## Tech Stack
-- **SQL** (SQL Server) :- RFM scoring using window functions (NTILE), CTEs, JOINs, Views
-- **Python** (Pandas, Matplotlib, Seaborn) :- data cleaning, RFM cross-validation, visualization
-- **Power BI** :- 3-page interactive dashboard (Executive, Operational, Manager views)
+- **SQL** (SQL Server) — RFM scoring using window functions (NTILE), CTEs, JOINs, Views
+- **Python** (Pandas, Matplotlib, Seaborn) — data cleaning, RFM cross-validation, visualization
+- **Power BI** — 3-page interactive dashboard (Executive, Operational, Manager views)
 
 ## Repository Structure
 '''
-**SQL/**                 -> RFM analysis queries | 
-**Python/**             -> Data cleaning, EDA, RFM notebook | 
-**PowerBi/**             -> Dashboard screenshots | 
-**Data/**              -> Cleaned datasets used in analysis | 
-**Documentation/**        -> Full project documentation (BRD, FRD, recommendations)
+├── SQL/                  → RFM analysis queries
+├── Python/                → Data cleaning, EDA, RFM notebook
+├── PowerBi/                → Dashboard screenshots
+├── Data/                  → Cleaned datasets used in analysis
+└── Documentation/          → Full project documentation (BRD, FRD, recommendations)
 '''
-
 ## Dashboard Preview
 See `PowerBi/` folder for Executive Summary, Operational Analysis, and Manager Insights pages.
 
