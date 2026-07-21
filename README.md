@@ -15,6 +15,7 @@ CartNest, a mid-sized e-commerce retailer, spends marketing budget equally acros
 - **SQL** (SQL Server) :- RFM scoring using window functions (NTILE), CTEs, JOINs, Views
 - **Python** (Pandas, Matplotlib, Seaborn) :- data cleaning, RFM cross-validation, visualization
 - **Power BI** :- 3-page interactive dashboard (Executive, Operational, Manager views)
+- **MS Excel** :- (Pivot Tables, VLOOKUP) for cross-validation of segment revenue findings.
 
 ## Repository Structure
 '''
