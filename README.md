@@ -59,6 +59,9 @@ CartNest, a mid-sized e-commerce retailer, spends marketing budget equally acros
 ## 🖥️ Dashboard Preview
 See `PowerBi/` folder for Executive Summary, Operational Analysis, and Manager Insights pages.
 
+**Executive Summary**
+![Executive Summary](PowerBi/P1-Executive-Summary.png)
+
 ---
 
 ## ✅ Business Recommendations
